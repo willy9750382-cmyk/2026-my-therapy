@@ -105,10 +105,6 @@ video {
     cursor: pointer;
 }
 
-.action-btn:hover {
-    opacity: 0.9;
-}
-
 .login-box {
     background: white;
     padding: 40px;
@@ -128,7 +124,6 @@ video {
     padding: 40px;
     max-width: 900px;
     margin: auto;
-    font-family: sans-serif;
 }
 
 textarea {
@@ -136,7 +131,6 @@ textarea {
     height: 300px;
     padding: 15px;
     font-size: 16px;
-    box-sizing: border-box;
 }
 
 </style>
@@ -155,43 +149,37 @@ textarea {
 
 <div class="container">
 
-    <h1 id="main-title">
-        안녕하세요, 오늘의 마음은 어떤가요?
-    </h1>
+<h1 id="main-title">
+안녕하세요, 오늘의 마음은 어떤가요?
+</h1>
 
-    <div class="menu-grid">
+<div class="menu-grid">
 
-        <!-- 감정탐색 -->
-        <div class="menu-card" onclick="openAnalysis()">
-            <h3>🔍 감정탐색 시작</h3>
-        </div>
-
-        <!-- 기분기록 -->
-        <div class="menu-card" onclick="openMoodRecord()">
-            <h3>📊 기분기록</h3>
-        </div>
-
-        <!-- 자료보기 -->
-        <div class="menu-card" onclick="openResources()">
-            <h3>📚 자료보기</h3>
-        </div>
-
-        <!-- 감정일기 -->
-        <div class="menu-card" onclick="openDiary()">
-            <h3>✏️ 감정일기</h3>
-        </div>
-
-        <!-- 커뮤니티 -->
-        <div class="menu-card" onclick="openCommunity()">
-            <h3>🤝 커뮤니티</h3>
-        </div>
-
-        <!-- 홈 -->
-        <div class="menu-card" onclick="location.reload()">
-            <h3>🏠 홈으로</h3>
-        </div>
-
+    <div class="menu-card" onclick="openAnalysis()">
+        <h3>🔍 감정탐색 시작</h3>
     </div>
+
+    <div class="menu-card" onclick="openMoodRecord()">
+        <h3>📊 기분기록</h3>
+    </div>
+
+    <div class="menu-card" onclick="openResources()">
+        <h3>📚 자료보기</h3>
+    </div>
+
+    <div class="menu-card" onclick="openDiary()">
+        <h3>✏️ 감정일기</h3>
+    </div>
+
+    <div class="menu-card" onclick="openCommunity()">
+        <h3>🤝 커뮤니티</h3>
+    </div>
+
+    <div class="menu-card" onclick="location.reload()">
+        <h3>🏠 홈으로</h3>
+    </div>
+
+</div>
 </div>
 
 <!-- 로그인 모달 -->
@@ -221,6 +209,10 @@ align-items:center;
 로그인
 </button>
 
+<button onclick="openSignup()" class="action-btn">
+회원가입
+</button>
+
 <button onclick="closeLogin()" class="action-btn">
 닫기
 </button>
@@ -228,14 +220,46 @@ align-items:center;
 </div>
 </div>
 
-<!-- 분석창 -->
+<!-- 회원가입 모달 -->
+<div id="signup-modal"
+style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+z-index:1001;
+justify-content:center;
+align-items:center;
+">
+
+<div class="login-box">
+
+<h2>회원가입</h2>
+
+<input type="text" id="signup-email" placeholder="이메일">
+
+<input type="password" id="signup-pw" placeholder="비밀번호">
+
+<button id="btn-signup-submit" class="action-btn">
+가입하기
+</button>
+
+<button onclick="closeSignup()" class="action-btn">
+닫기
+</button>
+
+</div>
+</div>
+
+<!-- 감정 분석 -->
 <div id="analysis-window">
 
 <h2 id="ai-status">AI 분석 중...</h2>
 
 <video id="video" autoplay muted></video>
-
-<div style="text-align:center;">
 
 <h1 id="emotion-result">
 표정을 지어주세요
@@ -255,21 +279,22 @@ align-items:center;
 
 </div>
 
-</div>
-
 <script type="module">
 
-import {
-    initializeApp
-} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 
 import {
     getAuth,
+    createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onAuthStateChanged,
     signOut
-} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+}
+from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
+
+// Firebase 설정
 const firebaseConfig = {
 
     apiKey: "YOUR_API_KEY",
@@ -287,16 +312,31 @@ const auth = getAuth(app);
 
 // 로그인창
 window.openLogin = () => {
-    document.getElementById('login-modal').style.display = 'flex';
+    document.getElementById('login-modal')
+        .style.display = 'flex';
 };
 
 window.closeLogin = () => {
-    document.getElementById('login-modal').style.display = 'none';
+    document.getElementById('login-modal')
+        .style.display = 'none';
+};
+
+
+// 회원가입창
+window.openSignup = () => {
+    document.getElementById('signup-modal')
+        .style.display = 'flex';
+};
+
+window.closeSignup = () => {
+    document.getElementById('signup-modal')
+        .style.display = 'none';
 };
 
 
 // 로그인
-document.getElementById('btn-login-submit').onclick = async () => {
+document.getElementById('btn-login-submit')
+.onclick = async () => {
 
     const email =
         document.getElementById('login-email').value;
@@ -306,30 +346,67 @@ document.getElementById('btn-login-submit').onclick = async () => {
 
     try {
 
-        await signInWithEmailAndPassword(auth, email, pw);
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            pw
+        );
 
-        alert("로그인 성공");
+        alert("로그인 성공!");
 
         closeLogin();
 
-    } catch (e) {
+    } catch(e) {
 
         alert("로그인 실패");
 
     }
+
 };
 
 
-// 상태 감지
+// 회원가입
+document.getElementById('btn-signup-submit')
+.onclick = async () => {
+
+    const email =
+        document.getElementById('signup-email').value;
+
+    const pw =
+        document.getElementById('signup-pw').value;
+
+    try {
+
+        await createUserWithEmailAndPassword(
+            auth,
+            email,
+            pw
+        );
+
+        alert("회원가입 성공!");
+
+        closeSignup();
+
+    } catch(e) {
+
+        alert("회원가입 실패");
+
+    }
+
+};
+
+
+// 로그인 상태
 onAuthStateChanged(auth, (user) => {
 
     const loginBtn =
         document.getElementById('login-nav-btn');
 
-    if (user) {
+    if(user){
 
         loginBtn.innerText =
-            user.email.split('@')[0] + "님 (로그아웃)";
+            user.email.split('@')[0] +
+            "님 (로그아웃)";
 
         loginBtn.onclick = () => signOut(auth);
 
@@ -344,7 +421,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 
-// 감정분석창 열기
+// 감정분석창
 window.openAnalysis = async () => {
 
     document.getElementById('analysis-window')
@@ -362,7 +439,7 @@ window.openAnalysis = async () => {
 
     const stream =
         await navigator.mediaDevices.getUserMedia({
-            video: true
+            video:true
         });
 
     video.srcObject = stream;
@@ -379,22 +456,22 @@ window.openAnalysis = async () => {
                 )
                 .withFaceExpressions();
 
-            if (detections.length > 0) {
+            if(detections.length > 0){
 
                 const exp =
                     detections[0].expressions;
 
                 const max =
-                    Object.keys(exp).reduce((a, b) =>
+                    Object.keys(exp).reduce((a,b)=>
                         exp[a] > exp[b] ? a : b
                     );
 
                 const map = {
 
-                    neutral: "평온함 😐",
-                    happy: "기쁨 😊",
-                    sad: "슬픔 😢",
-                    angry: "화남 😡"
+                    neutral:"평온함 😐",
+                    happy:"기쁨 😊",
+                    sad:"슬픔 😢",
+                    angry:"화남 😡"
 
                 };
 
@@ -402,30 +479,27 @@ window.openAnalysis = async () => {
                     .innerText = map[max] || max;
             }
 
-        }, 500);
+        },500);
 
     };
 
 };
 
 
-// 분석창 닫기
+// 닫기
 window.closeAnalysis = () => {
     location.reload();
 };
 
 
-// ======================
 // 음성인식
-// ======================
-
 const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
 let recognition;
 
-if (SpeechRecognition) {
+if(SpeechRecognition){
 
     recognition = new SpeechRecognition();
 
@@ -435,28 +509,31 @@ if (SpeechRecognition) {
 
     recognition.interimResults = true;
 
-} else {
-
-    alert("이 브라우저는 음성인식을 지원하지 않습니다.");
-
 }
 
 
 // 음성 시작
-window.startVoiceRecognition = () => {
+window.startVoiceRecognition = async () => {
 
-    if (!recognition) return;
+    if(!recognition) return;
 
     try {
+
+        await navigator.mediaDevices.getUserMedia({
+            audio:true
+        });
 
         recognition.start();
 
         document.getElementById('speech-result')
-            .innerText = "🎤 음성 듣는 중...";
+            .innerText =
+            "🎤 음성 듣는 중...";
 
-    } catch(e) {
+    } catch(e){
 
-        console.log(e);
+        document.getElementById('speech-result')
+            .innerText =
+            "마이크 권한 필요";
 
     }
 
@@ -468,11 +545,11 @@ recognition.onresult = (event) => {
 
     let transcript = '';
 
-    for (
+    for(
         let i = event.resultIndex;
         i < event.results.length;
         i++
-    ) {
+    ){
 
         transcript +=
             event.results[i][0].transcript;
@@ -480,203 +557,139 @@ recognition.onresult = (event) => {
     }
 
     document.getElementById('speech-result')
-        .innerText = "🗣️ " + transcript;
-
-
-    // 감정 키워드 분석
-    if (
-        transcript.includes("행복") ||
-        transcript.includes("좋아")
-    ) {
-
-        document.getElementById('emotion-result')
-            .innerText = "기쁨 😊";
-    }
-
-    if (
-        transcript.includes("슬퍼") ||
-        transcript.includes("우울")
-    ) {
-
-        document.getElementById('emotion-result')
-            .innerText = "슬픔 😢";
-    }
-
-    if (
-        transcript.includes("화나") ||
-        transcript.includes("짜증")
-    ) {
-
-        document.getElementById('emotion-result')
-            .innerText = "화남 😡";
-    }
+        .innerText =
+        "🗣️ " + transcript;
 
 };
 
-
-// 음성 오류
-recognition.onerror = (event) => {
-
-    console.log(event.error);
-
-    if (event.error === "audio-capture") {
-
-        document.getElementById('speech-result')
-            .innerText =
-            "🎤 마이크를 찾을 수 없습니다.";
-
-    } else {
-
-        document.getElementById('speech-result')
-            .innerText =
-            "오류: " + event.error;
-
-    }
-
-};
-
-
-// ======================
-// 메뉴 기능
-// ======================
 
 // 기분기록
 window.openMoodRecord = () => {
 
-    document.body.innerHTML = `
+document.body.innerHTML = `
 
-    <div class="page-box">
+<div class="page-box">
 
-        <h1>📊 오늘의 기분 기록</h1>
+<h1>📊 기분기록</h1>
 
-        <p>오늘 기분을 선택하세요.</p>
+<button onclick="alert('행복 😊')" class="action-btn">
+행복 😊
+</button>
 
-        <button onclick="alert('행복 😊')" class="action-btn">
-        행복 😊
-        </button>
+<button onclick="alert('슬픔 😢')" class="action-btn">
+슬픔 😢
+</button>
 
-        <button onclick="alert('슬픔 😢')" class="action-btn">
-        슬픔 😢
-        </button>
+<button onclick="location.reload()" class="action-btn">
+홈으로
+</button>
 
-        <button onclick="alert('화남 😡')" class="action-btn">
-        화남 😡
-        </button>
+</div>
 
-        <br><br>
+`;
 
-        <button onclick="location.reload()" class="action-btn">
-        홈으로
-        </button>
-
-    </div>
-    `;
 };
 
 
 // 자료보기
 window.openResources = () => {
 
-    document.body.innerHTML = `
+document.body.innerHTML = `
 
-    <div class="page-box">
+<div class="page-box">
 
-        <h1>📚 마음 건강 자료</h1>
+<h1>📚 자료보기</h1>
 
-        <ul>
+<ul>
+<li>스트레스 관리</li>
+<li>명상 호흡법</li>
+<li>우울감 극복</li>
+</ul>
 
-            <li>스트레스 관리 방법</li>
+<button onclick="location.reload()" class="action-btn">
+홈으로
+</button>
 
-            <li>우울감 극복 팁</li>
+</div>
 
-            <li>명상과 호흡법</li>
+`;
 
-        </ul>
-
-        <button onclick="location.reload()" class="action-btn">
-        홈으로
-        </button>
-
-    </div>
-    `;
 };
 
 
 // 감정일기
 window.openDiary = () => {
 
-    document.body.innerHTML = `
+document.body.innerHTML = `
 
-    <div class="page-box">
+<div class="page-box">
 
-        <h1>✏️ 감정일기</h1>
+<h1>✏️ 감정일기</h1>
 
-        <textarea
-        placeholder="오늘의 감정을 기록해보세요..."
-        ></textarea>
+<textarea
+placeholder="오늘의 감정을 적어보세요..."
+></textarea>
 
-        <br><br>
+<br><br>
 
-        <button
-        onclick="alert('저장 완료!')"
-        class="action-btn"
-        >
-        저장하기
-        </button>
+<button
+onclick="alert('저장 완료!')"
+class="action-btn"
+>
+저장하기
+</button>
 
-        <button
-        onclick="location.reload()"
-        class="action-btn"
-        >
-        홈으로
-        </button>
+<button
+onclick="location.reload()"
+class="action-btn"
+>
+홈으로
+</button>
 
-    </div>
-    `;
+</div>
+
+`;
+
 };
 
 
 // 커뮤니티
 window.openCommunity = () => {
 
-    document.body.innerHTML = `
+document.body.innerHTML = `
 
-    <div class="page-box">
+<div class="page-box">
 
-        <h1>🤝 커뮤니티</h1>
+<h1>🤝 커뮤니티</h1>
 
-        <p>
-        서로의 마음을 나누는 공간입니다.
-        </p>
+<p>서로의 감정을 나눠보세요.</p>
 
-        <div style="
-        background:#f5f5f5;
-        padding:20px;
-        border-radius:10px;
-        margin-top:20px;
-        ">
+<div style="
+background:#f5f5f5;
+padding:20px;
+border-radius:10px;
+">
 
-            <p>
-            😊 오늘 하루도 힘내세요!
-            </p>
+😊 오늘 하루도 수고했어요!
 
-        </div>
+</div>
 
-        <br>
+<br>
 
-        <button
-        onclick="location.reload()"
-        class="action-btn"
-        >
-        홈으로
-        </button>
+<button
+onclick="location.reload()"
+class="action-btn"
+>
+홈으로
+</button>
 
-    </div>
-    `;
+</div>
+
+`;
+
 };
 
 </script>
 
 </body>
 </html>
-```
